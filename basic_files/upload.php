@@ -1,67 +1,90 @@
-<?php
+<?php include("includes/header.php"); ?>
 
-// if(isset($_POST['submit'])){
-//     echo "<pre>";
-//     print_r($_FILES['file_upload']);
-//     echo "<pre>";
+<?php if(!$session->is_signed_in()) {redirect("./login.php");} ?>
 
-    $upload_errors = array(
-        UPLOAD_ERR_OK => 'There is no error, the file uploaded with success.',
-        UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
-        UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
-        UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
-        UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
-        UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
-        UPLOAD_ERR_CANT_WRITE => 'Cannot write to target directory. Please fix CHMOD.',
-        UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
-    );
 
-    $temp_name = $_FILES["file_upload"]['tmp_name'];
-    $file_name = $_FILES['file_upload']['name'];
-    $directory = "uploads";
+<?php 
+    $message = "";
+    if(isset($_FILES['file'])){
+        
+        $photo = new Photo();
+        $photo->user_id = $_SESSION['user_id'];
 
-    if(move_uploaded_file($temp_name, $directory . "/" . $file_name)){
-        $the_message = "The file uploaded with success.";
-    } else {
-        $the_erorr = $_FILES['file_upload']['error'];
-        $the_message = $upload_errors[$the_erorr];
+        $photo->title = $_POST['title'];
+        $photo->set_file($_FILES['file']);
+
+        if($photo->save()){
+            $message = "Photo upload succesfull";
+        } else {
+            $message = join("<br>", $photo->errors);
+        }
     }
 
-    
-// }
+
+
 
 
 ?>
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <!-- Top Menu Items --> <?php include_once "includes/top_nav.php";?>
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <?php include_once "includes/sidebar.php";?>
+            <!-- /.navbar-collapse -->
+        </nav>
+        <div id="page-wrapper">
+                <div class="container-fluid">
 
-    <form action="upload.php" enctype="multipart/form-data" method="post">
+            <!-- Page Heading -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">
+                        UPLOAD
+                    </h1>
 
-        <h2>
+                    <div class="row">
+                    <div class="col-md-6">
+                        <?php echo $message;?>
+                    <form action="upload.php" method="post" enctype="multipart/form-data">    
+                    
+                    <div class="form-group">
 
-        <?php 
-        
-            if(!empty($upload_errors)){
-                echo $the_message;
-            }
-        
-        ?>
+                        <input type="text" name="title" class="form-control">
+                    </div>
 
+                    <div class="form-group">
 
-        </h2>
+                        <input type="file" name="file">
+                    </div>
 
-        <input type="file" name="file_upload"><br>
+                    <div class="form-group">
 
-        <input type="submit" name="submit">
-    </form>
-    
-</body>
-</html>
+                        <input type="submit" name="submit">
+                    </div>
+
+                    </form>
+                    </div>
+                    </div> <!--  END OF ROW -->
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <form action="upload.php" class="dropzone">
+
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /.row -->
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- /#page-wrapper -->
+
+  <?php include("includes/footer.php"); ?>
